@@ -22,17 +22,18 @@ LR300AssaultRifle = [[-2, 25], [-8, 31], [-10, 33], [-14, 31], [-15, 25], [-14, 
 LR300AssaultRifleTime = 0.110
 
 # ~~MP5 RecoilTable~~ #
-MP5A4 = [[0, 40], [0, 29], [0, 33], [25, 33], [37, 34], [45, 32], [45, 24], [0, 8], [-23, 9],[-25, 12], [-24, 5],
-         [-15, 13], [10, 5], [19, 4], [16, 4], [16, 3], [12, 2], [6, 2], [-1, 1], [-5, 1], [-8, 0], [-10, 0], [-12, 0],
-         [-13, 0], [-13, 0], [-12, 0], [-18, 0], [-15, 0], [-10, 0]]
-MP5A4Time = 0.011
+MP5A4 = [[0, 40], [0, 29], [0, 33], [25, 33], [40, 34], [42, 32], [40, 24], [-55, 8], [-23, 9], [-25, 2], [-24, -5],
+         [0, 5], [0, 5], [19, 4], [20, 4], [22, 0], [28, 1], [25, 2], [25, 1], [-17, 1], [-22, 0], [-20, 0],
+         [-22, 0], [-23, 0], [-23, 0], [-22, 0], [-18, 0], [-15, 0], [-20, 0], [-10, 0]]
+MP5A4Time = 0.015
 
 
-# ~~M2 SCRIPS~~ #
+# ~~M2 RecoilTable~~ #
 # M249 recoil pattern is mostly down so I just have a loop for it instead of an 2D array for [x,y] co-ords
 M249Time = 0.125
 
 
+# Checks what keys are pressed to enable guns
 def ispressedchangenum():
     global guntype
     global timer
@@ -74,9 +75,8 @@ def ispressedchangenum():
     return
 
 
+# Menu, only visual
 def menu():
-    global guntype
-    global timer
     i = 1
     for x in guns:
         print(f'{i} - {x}')
@@ -85,6 +85,7 @@ def menu():
     print("0 + any other key on numpad - Close")
 
 
+# Is mouse button 1 and 2 pressed
 def ispressed():
     a = win32api.GetKeyState(0x01)
     b = win32api.GetKeyState(0x02)
@@ -92,6 +93,7 @@ def ispressed():
         return True
 
 
+# Disables scripts
 def ispressednumber():
     global guntype
     global attachment
@@ -102,7 +104,8 @@ def ispressednumber():
         loop()
 
 
-def move(x,y):
+# Moves mouse X amount
+def move(x, y):
     ctypes.windll.user32.mouse_event(0x0001, x, y, 0, 0)
 
 
