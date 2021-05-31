@@ -10,3 +10,7 @@ Based off of: https://github.com/realstrings/Rust-recoil-compensation
 - Make sure you have python install if not install it from here: https://www.python.org/downloads/ 
 - After that download the win32 library through cmd promt with: `pip install pywin32`
 - Then copy and paste the code into an empty text file and make sure you save it with the file ending .py
+
+## License
+Please make sure you review the licensing, it is under the file name LICENCE\
+Protected Under: GNU General Public License v3.0
