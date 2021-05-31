@@ -10,8 +10,8 @@ guns = ['AssaultRifle', 'AssaultRifleHolo', 'AssaultRifle8X', 'LR300AssaultRifle
 
 # ~~AK RecoilTable~~ #
 AssaultRifle = [[-35, 52.3906], [10, 46], [-40, 42], [-55, 37], [-5, 33], [0, 28], [30, 24], [20, 19], [48, 14],
-                [42, 9], [35, 9], [30, 18], [38, 18], [25, 25], [0, 29], [-15, 32], [-22, 33], [-32, 32], [-40, 29],
-                [-46, 24], [-45, 17], [-45, 8], [-42, 5], [-35, 14], [-25, 21], [0, 25], [0, 28], [40, 28], [50, 26],
+                [38, 9], [38, 9], [34, 18], [38, 18], [25, 25], [0, 29], [-15, 32], [-22, 33], [-32, 32], [-38, 29],
+                [-43, 24], [-45, 17], [-45, 8], [-42, 5], [-35, 14], [-25, 21], [0, 25], [0, 28], [40, 28], [50, 26],
                 [45, 15], [38, 21]]
 AssaultRifleTime = 0.013
 
@@ -22,17 +22,18 @@ LR300AssaultRifle = [[-2, 25], [-8, 31], [-10, 33], [-14, 31], [-15, 25], [-14, 
 LR300AssaultRifleTime = 0.110
 
 # ~~MP5 RecoilTable~~ #
-MP5A4 = [[0, 40], [2.5, 29], [5, 33], [30, 33], [30, 29], [25, 22], [25, 13], [0, 10], [0, 0], [0, 0], [0, 0], [0, 0],
-         [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0],
-         [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]
-MP5A4Time = 0.011
+MP5A4 = [[0, 40], [0, 29], [0, 33], [25, 33], [40, 34], [42, 32], [40, 24], [-55, 8], [-23, 9], [-23, 3], [-23, -8],
+         [0, 8], [0, 8], [19, 4], [20, 4], [22, 0], [28, 1], [25, 2], [25, 1], [-22, 1], [-22, 0], [-30, 0],
+         [-32, 0], [-28, 0], [-28, 0], [-28, 0], [-26, 0], [-22, 0], [-20, 0], [-10, 0]]
+MP5A4Time = 0.001
 
 
-# ~~M2 SCRIPS~~ #
+# ~~M2 RecoilTable~~ #
 # M249 recoil pattern is mostly down so I just have a loop for it instead of an 2D array for [x,y] co-ords
 M249Time = 0.125
 
 
+# Checks what keys are pressed to enable guns
 def ispressedchangenum():
     global guntype
     global timer
@@ -74,9 +75,8 @@ def ispressedchangenum():
     return
 
 
+# Menu, only visual
 def menu():
-    global guntype
-    global timer
     i = 1
     for x in guns:
         print(f'{i} - {x}')
@@ -85,6 +85,7 @@ def menu():
     print("0 + any other key on numpad - Close")
 
 
+# Is mouse button 1 and 2 pressed
 def ispressed():
     a = win32api.GetKeyState(0x01)
     b = win32api.GetKeyState(0x02)
@@ -92,6 +93,7 @@ def ispressed():
         return True
 
 
+# Disables scripts
 def ispressednumber():
     global guntype
     global attachment
@@ -102,7 +104,8 @@ def ispressednumber():
         loop()
 
 
-def move(x,y):
+# Moves mouse X amount
+def move(x, y):
     ctypes.windll.user32.mouse_event(0x0001, x, y, 0, 0)
 
 
