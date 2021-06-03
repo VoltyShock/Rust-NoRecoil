@@ -33,15 +33,13 @@ M249Time = 0.125
 
 
 def choosegun():
-    gun = 0
-    timer = 0
     if gun_type.get() == 1:
         gun = AssaultRifle
         timer = AssaultRifleTime
-    elif gun_type.get() == 2:
+    if gun_type.get() == 2:
         gun = LR300AssaultRifle
         timer = LR300AssaultRifleTime
-    elif gun_type.get() == 3:
+    if gun_type.get() == 3:
         gun = MP5A4
         timer = MP5A4Time
     return gun, timer
@@ -98,9 +96,10 @@ def godown(gun, timer, attachments):
 
 
 def loop():
-    while gun_type.get() != 0:
-        if ispressed():
-            godown(choosegun()[0], choosegun()[1], attachment.get())
+    while True:
+        while gun_type.get() != 0:
+            if ispressed():
+                godown(choosegun()[0], choosegun()[1], attachment.get())
 
 
 def start():
@@ -116,10 +115,10 @@ gun_type = IntVar()
 attachment = IntVar()
 
 
-guns = [Radiobutton(root, text="None", command=start, variable=gun_type, value=0),
-        Radiobutton(root, text="AK-47", command=start, variable=gun_type, value=1),
-        Radiobutton(root, text="LR300", command=start, variable=gun_type, value=2),
-        Radiobutton(root, text="MP5A4", command=start, variable=gun_type, value=3)]
+guns = [Radiobutton(root, text="None", variable=gun_type, value=0),
+        Radiobutton(root, text="AK-47", variable=gun_type, value=1),
+        Radiobutton(root, text="LR300", variable=gun_type, value=2),
+        Radiobutton(root, text="MP5A4", variable=gun_type, value=3)]
 
 attachments = [Radiobutton(root, text="None", variable=attachment, value=0),
                Radiobutton(root, text="Holo", variable=attachment, value=1),
@@ -135,6 +134,8 @@ label2.pack(anchor=NW)
 for x in attachments:
     x.pack(anchor=NW)
 
+
+start()
 
 root.geometry("400x300")
 root.mainloop()
