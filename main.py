@@ -2,13 +2,14 @@ import win32api
 import time
 import ctypes
 from tkinter import *
+from tkinter import ttk
 import threading
 
 sensitivity = 0.288
 guns = ['AssaultRifle', 'AssaultRifleHolo', 'AssaultRifle8X', 'LR300', 'LR300-Holo', 'MP5A4', 'MP5A4-Holo', 'M249']
 
 # ~~AK RecoilTable~~ #
-AssaultRifle = [[-35, 52.3906], [15, 46], [-40, 42], [-55, 37], [0, 34], [0, 28], [30, 25], [20, 22], [46, 15],
+AssaultRifle = [[-38, 52.3906], [15, 46], [-40, 42], [-57, 37], [0, 34], [0, 28], [30, 25], [20, 22], [46, 15],
                 [38, 11], [38, 10], [35, 18], [38, 18], [25, 25], [0, 29], [-17, 32], [-22, 33], [-34, 32], [-38, 29],
                 [-45, 24], [-45, 17], [-45, 8], [-42, 5], [-36, 14], [-25, 21], [0, 25], [0, 28], [40, 28], [53, 26],
                 [48, 15], [38, 21]]
@@ -21,9 +22,9 @@ LR300AssaultRifle = [[-2, 25], [-8, 31], [-10, 33], [-14, 31], [-18, 25], [-16, 
 LR300AssaultRifleTime = 0.011
 
 # ~~MP5 RecoilTable~~ #
-MP5A4 = [[0, 40], [0, 29], [0, 33], [25, 33], [45, 34], [47, 32], [-12, 24], [-43, 8], [-23, 9], [-18, 3], [-2, -8],
-         [0, 8], [12, 8], [15, 4], [20, 2], [22, 0], [28, 1], [30, 2], [-27, 1], [-26, 4], [-26, 2], [-32, -2],
-         [-32, 2], [-30, -2], [-28, 0], [-28, 0], [-26, 10], [-22, -10], [-20, 0], [-10, 0]]
+MP5A4 = [[2, 40], [-5, 29], [18, 33], [25, 33], [42, 34], [25, 32], [-15, 24], [-15, 8], [-10, 9], [-8, 3], [-2, 8],
+         [0, 8], [12, 8], [12, 4], [10, 2], [5, 0], [8, 1], [5, 5], [-15, 5], [-18, 5], [-18, 5], [-18, 2],
+         [-18, 2], [-10, 2], [-15, 0], [-15, 0], [-15, 10], [-2, -10], [35, 0], [10, 0]]
 MP5A4Time = 0.005
 
 
@@ -81,8 +82,8 @@ def godown(gun, timer, attachments):
                 truex = (((i[0]*1.2) / 2) / sensitivity)
                 truey = (((i[1]*1.2) / 2) / sensitivity)
             elif attachments == 2:
-                truex = (((i[0] * 3.8) / 2) / sensitivity)
-                truey = (((i[1] * 3.8) / 2) / sensitivity)
+                truex = (((i[0] * 3.6) / 2) / sensitivity)
+                truey = (((i[1] * 3.6) / 2) / sensitivity)
             elif attachments == 0:
                 truex = ((i[0]/2)/sensitivity)
                 truey = ((i[1]/2)/sensitivity)
@@ -107,32 +108,59 @@ def start():
     thrd.start()
 
 
+def update_sens(*args):
+    global sensitivity
+    sensitivity = round(float(sens_mul.get()), 3)
+    if sensitivity == 0:
+        sensitivity = 0.001
+
+
 # UI
 root = Tk()
-
+root.title("Rust No-Recoil")
+root.resizable(0, 0)
 
 gun_type = IntVar()
 attachment = IntVar()
+sens_mul = StringVar()
+
+guns = [ttk.Radiobutton(root, text="None", variable=gun_type, value=0),
+        ttk.Radiobutton(root, text="AK-47", variable=gun_type, value=1),
+        ttk.Radiobutton(root, text="LR300", variable=gun_type, value=2),
+        ttk.Radiobutton(root, text="MP5A4", variable=gun_type, value=3)]
+
+attachments = [ttk.Radiobutton(root, text="None", variable=attachment, value=0),
+               ttk.Radiobutton(root, text="Holo", variable=attachment, value=1),
+               ttk.Radiobutton(root, text="8x", variable=attachment, value=2)]
 
 
-guns = [Radiobutton(root, text="None", variable=gun_type, value=0),
-        Radiobutton(root, text="AK-47", variable=gun_type, value=1),
-        Radiobutton(root, text="LR300", variable=gun_type, value=2),
-        Radiobutton(root, text="MP5A4", variable=gun_type, value=3)]
+sens_title = ttk.Label(root, text="Sensitivity:")
+sens = ttk.Entry(root, textvariable=sens_mul)
+sens_submit = ttk.Button(root, text="Set Sensitivity", command=update_sens)
+sens.grid(column=3, row=2)
+sens_title.grid(column=3, row=1)
+sens_submit.grid(column=3, row=3)
 
-attachments = [Radiobutton(root, text="None", variable=attachment, value=0),
-               Radiobutton(root, text="Holo", variable=attachment, value=1),
-               Radiobutton(root, text="8x", variable=attachment, value=2)]
 
-label1 = Label(root, text="Guns:")
-label1.pack(anchor=NW)
+var = 2
+
+label1 = ttk.Label(root, text="Guns:")
+label1.grid(column=0, row=1, ipadx="8px")
 for x in guns:
-    x.pack(anchor=NW)
+    x.grid(column=0, row=var)
+    var = var + 1
 
-label2 = Label(root, text="Attachments:")
-label2.pack(anchor=NW)
+var = 2
+label2 = ttk.Label(root, text="Attachments:")
+label2.grid(column=1, row=1, ipadx="8px")
 for x in attachments:
-    x.pack(anchor=NW)
+    x.grid(column=1, row=var)
+    var = var+1
+
+watermark = ttk.Label(root, text="Rust No-Recoil Made By Voltyshock.")
+watermark.grid(column=3, row=len(guns)+2, sticky=SW)
+root.grid_rowconfigure(len(guns)+2, weight=5)
+root.grid_columnconfigure(3, weight=5)
 
 
 start()
