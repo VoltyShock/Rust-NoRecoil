@@ -43,6 +43,9 @@ def choosegun():
     if gun_type.get() == 3:
         gun = MP5A4
         timer = MP5A4Time
+    if gun_type.get() == 4:
+        gun = "M249"
+        timer = M249Time
     return gun, timer
 
 
@@ -69,10 +72,10 @@ def godown(gun, timer, attachments):
                     move(0, int(28/sensitivity))
                 # Crouched Still
                 else:
-                    move(0, int(16/sensitivity))
+                    move(0, int(17/sensitivity))
             # Stood up M249
             else:
-                move(0, int(32/sensitivity))
+                move(0, int(33/sensitivity))
             time.sleep(timer/8)
             if not ispressed():
                 return
@@ -100,8 +103,8 @@ def loop():
     global stop
     while True:
         while gun_type.get() != 0:
-            if stop:
-                return
+            if gun_type.get() == 4:
+                attachment.set(2)
             if ispressed():
                 godown(choosegun()[0], choosegun()[1], attachment.get())
 
@@ -120,6 +123,9 @@ def check_input():
         mp5 = win32api.GetKeyState(0x63)
         if mp5 < 0:
             gun_type.set(3)
+        m2 = win32api.GetKeyState(0x64)
+        if m2 < 0:
+            gun_type.set(4)
         iron = win32api.GetKeyState(0x67)
         if iron < 0:
             attachment.set(0)
@@ -149,7 +155,7 @@ def update_sens(*args):
             sensitivity = 1
             sens_mul.set("1")
     except ValueError:
-        sensitivity = 0.001
+        sens_mul.set("")
 
 
 # UI
@@ -165,7 +171,8 @@ sens_mul.set(str(sensitivity))
 guns = [ttk.Radiobutton(root, text="None", variable=gun_type, value=0),
         ttk.Radiobutton(root, text="AK-47", variable=gun_type, value=1),
         ttk.Radiobutton(root, text="LR300", variable=gun_type, value=2),
-        ttk.Radiobutton(root, text="MP5A4", variable=gun_type, value=3)]
+        ttk.Radiobutton(root, text="MP5A4", variable=gun_type, value=3),
+        ttk.Radiobutton(root, text="M249", variable=gun_type, value=4)]
 
 attachments = [ttk.Radiobutton(root, text="None", variable=attachment, value=0),
                ttk.Radiobutton(root, text="Holo", variable=attachment, value=1),
