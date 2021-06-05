@@ -10,8 +10,8 @@ sensitivity = 0.288
 stop = False
 # ~~AK RecoilTable~~ #
 AssaultRifle = [[-38, 52.3906], [15, 46], [-42, 42], [-59, 37], [0, 34], [0, 28], [34, 25], [22, 26], [46, 18],
-                [38, 14], [38, 15], [38, 18], [38, 18], [23, 28], [0, 29], [-25, 32], [-28, 33], [-34, 32], [-38, 29],
-                [-45, 24], [-45, 17], [-45, 8], [-42, 5], [-36, 14], [-25, 21], [0, 25], [0, 28], [40, 28], [53, 26],
+                [38, 14], [38, 15], [38, 18], [38, 18], [25, 28], [0, 29], [-22, 32], [-26, 33], [-32, 32], [-36, 29],
+                [-45, 24], [-45, 17], [-45, 8], [-42, 5], [-38, 14], [-14, 21], [0, 25], [10, 28], [40, 28], [53, 26],
                 [48, 15], [38, 21]]
 AssaultRifleTime = 0.013
 
@@ -22,9 +22,9 @@ LR300AssaultRifle = [[-2, 25], [-8, 31], [-10, 33], [-14, 31], [-18, 25], [-16, 
 LR300AssaultRifleTime = 0.011
 
 # ~~MP5 RecoilTable~~ #
-MP5A4 = [[2, 40], [-5, 29], [18, 36], [25, 36], [32, 34], [25, 32], [-10, 24], [-10, 8], [-10, 9], [-8, 3], [-12, 8],
-         [0, 8], [8, 8], [8, 4], [8, 2], [5, 0], [8, 1], [5, 5], [-20, 5], [-25, 5], [-25, 5], [-25, 2],
-         [-15, 2], [-10, 2], [-15, 0], [-15, 0], [-25, 10], [-2, -10], [25, 0], [10, 0]]
+MP5A4 = [[3, 40], [-5, 29], [18, 36], [28, 36], [34, 34], [34, 32], [-23, 24], [-14, 8], [-17, 9], [-18, 3], [-2, 8],
+         [20, 8], [18, 8], [25, 4], [12, 2], [7, 0], [7, 1], [5, 5], [-45, 5], [-40, 5], [-30, 5], [-25, 2],
+         [-15, 2], [-10, 2], [-15, 0], [15, 0], [-5, 10], [-2, -10], [25, 0], [10, 0]]
 MP5A4Time = 0.005
 
 
@@ -112,28 +112,28 @@ def loop():
 def check_input():
     while True:
         none = win32api.GetKeyState(0x60)
-        if none < 0:
+        if none < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(0)
         ak = win32api.GetKeyState(0x61)
-        if ak < 0:
+        if ak < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(1)
         lr = win32api.GetKeyState(0x62)
-        if lr < 0:
+        if lr < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(2)
         mp5 = win32api.GetKeyState(0x63)
-        if mp5 < 0:
+        if mp5 < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(3)
         m2 = win32api.GetKeyState(0x64)
-        if m2 < 0:
+        if m2 < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(4)
         iron = win32api.GetKeyState(0x67)
-        if iron < 0:
+        if iron < 0 and win32api.GetKeyState(0x11) < 0:
             attachment.set(0)
         holo = win32api.GetKeyState(0x68)
-        if holo < 0:
+        if holo < 0 and win32api.GetKeyState(0x11) < 0:
             attachment.set(1)
         eight = win32api.GetKeyState(0x69)
-        if eight < 0:
+        if eight < 0 and win32api.GetKeyState(0x11) < 0:
             attachment.set(2)
 
 
@@ -191,30 +191,29 @@ sens_submit.grid(column=3, row=3)
 # Presents Guns
 row = 2
 gun_title = ttk.Label(root, text="Guns:")
-gun_title.grid(column=0, row=1, ipadx="8px", sticky=W)
+gun_title.grid(column=0, row=1, ipadx="4px", sticky=W)
 for x in guns:
-    x.grid(column=0, row=row, sticky=W)
+    x.grid(column=0, row=row, sticky=W, ipadx="4px")
     row = row + 1
 
 # Presents Attachments
 row = 2
 attachment_title = ttk.Label(root, text="Attachments:")
-attachment_title.grid(column=1, row=1, ipadx="8px", sticky=W)
+attachment_title.grid(column=1, row=1, ipadx="18px", sticky=W)
 for x in attachments:
-    x.grid(column=1, row=row, sticky=W)
+    x.grid(column=1, row=row, sticky=W, ipadx="18px")
     row = row+1
 
 # Instructions on keybinds
-info = ttk.Label(root, text="Gun Keybinds (numpad):\n"
-                            "0 = None, 1 = AK-47, 2 = LR300, 3 = MP5A4\n"
-                            "Attachment Keybinds (numpad):\n"
+info = ttk.Label(root, text="Gun Keybinds (ctrl + numpad):\n"
+                            "0 = None, 1 = AK-47, 2 = LR300, 3 = MP5A4, 4 = M249\n"
+                            "Attachment Keybinds (ctrl + numpad):\n"
                             "7 = None, 8 = Holographic Site, 9 = 8x Scope")
-info.grid(column=0, row=len(guns)+2, sticky=S, columnspan=3)
+info.grid(column=0, row=len(guns)+2, sticky=SW, columnspan=4)
 root.grid_rowconfigure(len(guns)+2, weight=5)
-
 # Starts the scripts
 start()
 
-root.geometry("400x300")
+root.geometry("325x275")
 root.mainloop()
 
