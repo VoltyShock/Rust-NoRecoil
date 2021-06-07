@@ -1,116 +1,67 @@
 import win32api
 import time
-import ctypes
 from tkinter import *
 from tkinter import ttk
-import threading
+import gc
+import json
 
 
 sensitivity = 0.288
 stop = False
-# ~~AK RecoilTable~~ #
-AssaultRifle = [[-38, 52.3906], [15, 46], [-42, 42], [-59, 37], [0, 34], [0, 28], [34, 25], [22, 26], [46, 18],
-                [38, 14], [38, 15], [38, 18], [38, 18], [25, 28], [0, 29], [-22, 32], [-26, 33], [-32, 32], [-36, 29],
-                [-45, 24], [-45, 17], [-45, 8], [-42, 5], [-38, 14], [-14, 21], [0, 25], [10, 28], [40, 28], [53, 26],
-                [48, 15], [38, 21]]
+
+
+list_guns = ["AssaultRifle", "LR300AssaultRifle", "MP5A4"]
+gun_dict = {}
+RecoilTable = json.load(open("Rust-NoRecoil/RecoilTables", "r"))
+
+for i in list_guns:
+    gun_dict[i+"Iron"] = json.loads(RecoilTable[i + "Iron"])
+    gun_dict[i+"Holo"] = json.loads(RecoilTable[i + "Holo"])
+    gun_dict[i+"Eight"] = json.loads(RecoilTable[i + "Eight"])
+
+# ~~Gun Timers ~~ #
 AssaultRifleTime = 0.013
-
-# ~~LR RecoilTable~~ #
-LR300AssaultRifle = [[-2, 25], [-8, 31], [-10, 33], [-14, 31], [-18, 25], [-16, 20], [-14, 12], [-10, 12], [12, 8],
-                     [19, 8], [17, 8], [15, 7], [10, 5], [0, 4], [-10, 4], [-9, 4], [-12, 3], [-17, 3], [-18, 3],
-                     [-18, 2], [-16, 2], [-16, 2], [-15, 2], [-7, 2], [-3, 2], [13, 2], [30, 2], [36, 3], [30, 3]]
 LR300AssaultRifleTime = 0.011
-
-# ~~MP5 RecoilTable~~ #
-MP5A4 = [[3, 40], [-5, 29], [18, 36], [28, 36], [34, 34], [34, 32], [-23, 24], [-14, 8], [-17, 9], [-18, 3], [-2, 8],
-         [20, 8], [18, 8], [25, 4], [12, 2], [7, 0], [7, 1], [5, 5], [-45, 5], [-40, 5], [-30, 5], [-25, 2],
-         [-15, 2], [-10, 2], [-15, 0], [15, 0], [-5, 10], [-2, -10], [25, 0], [10, 0]]
 MP5A4Time = 0.005
-
-
-# ~~M2 RecoilTable~~ #
-# M249 recoil pattern is mostly down so I just have a loop for it instead of an 2D array for [x,y] co-ords
 M249Time = 0.125
 
 
-def choosegun():
+def start():
+    import threading
+    thrd1 = threading.Thread(target=loop)
+    thrd2 = threading.Thread(target=check_input)
+    thrd2.start()
+    thrd1.start()
+
+
+def choose_gun():
+    global gun_dict
+
     if gun_type.get() == 1:
-        gun = AssaultRifle
+        gun = "AssaultRifle"
         timer = AssaultRifleTime
     if gun_type.get() == 2:
-        gun = LR300AssaultRifle
+        gun = "LR300AssaultRifle"
         timer = LR300AssaultRifleTime
     if gun_type.get() == 3:
-        gun = MP5A4
+        gun = "MP5A4"
         timer = MP5A4Time
     if gun_type.get() == 4:
         gun = "M249"
         timer = M249Time
+
+    if attachment.get() == 0:
+        gun = gun_dict[gun + "Iron"]
+    elif attachment.get() == 1:
+        gun = gun_dict[gun + "Holo"]
+    elif attachment.get() == 2:
+        gun = gun_dict[gun + "Eight"]
+
     return gun, timer
 
 
-# Is mouse button 1 and 2 pressed
-def ispressed():
-    a = win32api.GetKeyState(0x01)
-    b = win32api.GetKeyState(0x02)
-    if a < 0 and b < 0:
-        return True
-
-
-# Moves mouse X amount
-def move(x, y):
-    ctypes.windll.user32.mouse_event(0x0001, x, y, 0, 0)
-
-
-def godown(gun, timer, attachments):
-    if gun == 'M249':
-        for i in range(0, 100):
-            # Crouched
-            if win32api.GetKeyState(0x11) < 0:
-                # Crouched Strafing
-                if win32api.GetKeyState(0x58) < 0 or win32api.GetKeyState(0x41) < 0 or win32api.GetKeyState(0x44) < 0 or win32api.GetKeyState(0x53) < 0:
-                    move(0, int(28/sensitivity))
-                # Crouched Still
-                else:
-                    move(0, int(17/sensitivity))
-            # Stood up M249
-            else:
-                move(0, int(33/sensitivity))
-            time.sleep(timer/8)
-            if not ispressed():
-                return
-    else:
-        for i in gun:
-            if attachments == 1:
-                truex = (((i[0]*1.2) / 2) / sensitivity)
-                truey = (((i[1]*1.2) / 2) / sensitivity)
-            elif attachments == 2:
-                truex = (((i[0] * 3.6) / 2) / sensitivity)
-                truey = (((i[1] * 3.6) / 2) / sensitivity)
-            elif attachments == 0:
-                truex = ((i[0]/2)/sensitivity)
-                truey = ((i[1]/2)/sensitivity)
-            for x in range(8):
-                movex = (truex/8)
-                movey = (truey/8)
-                move(int(movex), int(movey))
-                time.sleep(timer/8)
-            if not ispressed():
-                return
-
-
-def loop():
-    global stop
-    while True:
-        while gun_type.get() != 0:
-            if gun_type.get() == 4:
-                attachment.set(2)
-            if ispressed():
-                godown(choosegun()[0], choosegun()[1], attachment.get())
-
-
 def check_input():
-    while True:
+    while not stop:
         none = win32api.GetKeyState(0x60)
         if none < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(0)
@@ -135,16 +86,66 @@ def check_input():
         eight = win32api.GetKeyState(0x69)
         if eight < 0 and win32api.GetKeyState(0x11) < 0:
             attachment.set(2)
+        gc.collect(0)
 
 
-def start():
-    thrd1 = threading.Thread(target=loop)
-    thrd2 = threading.Thread(target=check_input)
-    thrd2.start()
-    thrd1.start()
+# Is mouse button 1 and 2 pressed
+def is_pressed():
+    a = win32api.GetKeyState(0x01)
+    b = win32api.GetKeyState(0x02)
+    if a < 0 and b < 0:
+        return True
 
 
-def update_sens(*args):
+def loop():
+    global stop
+    while not stop:
+        while gun_type.get() != 0:
+            if gun_type.get() == 4:
+                attachment.set(2)
+            if is_pressed():
+                go_down(choose_gun()[0], choose_gun()[1])
+
+
+def go_down(gun, timer):
+    if gun == 'M249':
+        for i in range(0, 100):
+            # Crouched
+            if win32api.GetKeyState(0x11) < 0:
+                # Crouched Strafing
+                if win32api.GetKeyState(0x58) < 0 or win32api.GetKeyState(0x41) < 0 or win32api.GetKeyState(0x44) < 0 or win32api.GetKeyState(0x53) < 0:
+                    move(0, int(28/sensitivity))
+                # Crouched Still
+                else:
+                    move(0, int(17/sensitivity))
+            # Stood up M249
+            else:
+                move(0, int(33/sensitivity))
+            time.sleep(timer/8)
+            if not is_pressed():
+                gc.collect(0)
+                return
+    else:
+        for i in gun:
+            truex = ((i[0]/2)/sensitivity)
+            truey = ((i[1]/2)/sensitivity)
+            for x in range(8):
+                movex = (truex/8)
+                movey = (truey/8)
+                move(int(movex), int(movey))
+                time.sleep(timer/8)
+            if not is_pressed():
+                gc.collect(0)
+                return
+            
+            
+# Moves mouse X amount
+def move(x, y):
+    import ctypes
+    ctypes.windll.user32.mouse_event(0x0001, x, y, 0, 0)
+
+
+def update_sens():
     global sensitivity
     try:
         sensitivity = round(float(sens_mul.get()), 3)
@@ -216,4 +217,3 @@ start()
 
 root.geometry("325x275")
 root.mainloop()
-
