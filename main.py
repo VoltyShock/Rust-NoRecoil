@@ -7,20 +7,12 @@ import json
 
 
 sensitivity = 0.288
-stop = False
 
 
-list_guns = ["AssaultRifle", "LR300AssaultRifle", "MP5A4"]
-gun_dict = {}
-RecoilTable = json.load(open("Rust-NoRecoil/RecoilTables", "r"))
-
-for i in list_guns:
-    gun_dict[i+"Iron"] = json.loads(RecoilTable[i + "Iron"])
-    gun_dict[i+"Holo"] = json.loads(RecoilTable[i + "Holo"])
-    gun_dict[i+"Eight"] = json.loads(RecoilTable[i + "Eight"])
+gun_dict = json.load(open("Rust-NoRecoil/RecoilTables", "r"))
 
 # ~~Gun Timers ~~ #
-AssaultRifleTime = 0.013
+AssaultRifleTime = 0.001
 LR300AssaultRifleTime = 0.011
 MP5A4Time = 0.005
 M249Time = 0.125
@@ -49,6 +41,7 @@ def choose_gun():
     if gun_type.get() == 4:
         gun = "M249"
         timer = M249Time
+        return gun, timer
 
     if attachment.get() == 0:
         gun = gun_dict[gun + "Iron"]
@@ -61,7 +54,7 @@ def choose_gun():
 
 
 def check_input():
-    while not stop:
+    while True:
         none = win32api.GetKeyState(0x60)
         if none < 0 and win32api.GetKeyState(0x11) < 0:
             gun_type.set(0)
@@ -98,8 +91,7 @@ def is_pressed():
 
 
 def loop():
-    global stop
-    while not stop:
+    while True:
         while gun_type.get() != 0:
             if gun_type.get() == 4:
                 attachment.set(2)
@@ -149,7 +141,7 @@ def update_sens():
     global sensitivity
     try:
         sensitivity = round(float(sens_mul.get()), 3)
-        if sensitivity < 0:
+        if sensitivity < 0.001:
             sensitivity = 0.001
             sens_mul.set("0")
         if sensitivity > 1:
@@ -157,6 +149,7 @@ def update_sens():
             sens_mul.set("1")
     except ValueError:
         sens_mul.set("")
+    gc.collect(0)
 
 
 # UI
@@ -212,6 +205,7 @@ info = ttk.Label(root, text="Gun Keybinds (ctrl + numpad):\n"
                             "7 = None, 8 = Holographic Site, 9 = 8x Scope")
 info.grid(column=0, row=len(guns)+2, sticky=SW, columnspan=4)
 root.grid_rowconfigure(len(guns)+2, weight=5)
+
 # Starts the scripts
 start()
 
