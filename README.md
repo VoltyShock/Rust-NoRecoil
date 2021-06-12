@@ -9,7 +9,7 @@ Based off of: https://github.com/realstrings/Rust-recoil-compensation
 ## Installation
 - Make sure you have python install if not install it from here: https:`//www.python.org/downloads/ `
 - After that download the win32 library through cmd promt with: `pip install pywin32`
-- Download the scripts in a zip file from her: `https://github.com/VoltyShock/Rust-NoRecoil/archive/refs/heads/Test.zip`
+- Download the scripts in a zip file from her: `https://github.com/VoltyShock/Rust-NoRecoil/archive/refs/heads/main.zip`
 - After that make sure the address of the recoil table file is save properly in your python file, look for the line of 
 code that says `RecoilTable = json.load(open("Rust-NoRecoil/RecoilTables", "r"))` and change accordingly
 
